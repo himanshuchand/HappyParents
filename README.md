@@ -8,15 +8,13 @@
 
 ### The Problem
 1. New parents lack accessible, immediate guidance for common parenting questions
-2. Vaccination tracking is fragmented across paper records and basic apps
-3. No integrated solution combines knowledge access with health record management
+2. No integrated solution combines knowledge access with health record management
 
 ### The Solution
 HappyParents provides:
 - **AI Chat Assistant**: Instant, evidence-based parenting advice powered by Claude
-- **Vaccination Tracker**: Simple, visual tracking of immunization schedules
 - **Zero Setup**: Works immediately in any browser, no account required
-
+- **Vaccination Tracker**: Simple, visual tracking of immunization schedules
 
 
 ## 🚀 Quick Start (5 minutes)
@@ -38,22 +36,19 @@ HappyParents provides:
 4. Create a new key
 5. Copy and paste into the app when prompted
 
-**Cost**: Claude Sonnet 4 costs approximately $0.003 per conversation message. For MVP testing with 10 users having 20 conversations each = ~$0.60 total.
-
-
 
 ## 📋 Features
 
 ### MVP (Current Version)
 - ✅ AI chat powered by Claude Sonnet 4
-- ✅ Multi-child vaccination tracking
-- ✅ Indian vaccination schedule (UIP-compliant)
 - ✅ Progress visualization
 - ✅ Local data persistence (no server needed)
 - ✅ Mobile responsive design
 - ✅ Zero dependencies (single HTML file)
 
 ### Roadmap (Post-MVP)
+- 🔲 Multi-child vaccination tracking
+- 🔲 Indian vaccination schedule (UIP-compliant)
 - 🔲 Export vaccination record as PDF
 - 🔲 Push notifications for upcoming vaccines
 - 🔲 Multiple country vaccine schedules
@@ -132,8 +127,8 @@ This is an MVP for validation. If you want to contribute:
 
 **If you want to learn while building:**
 - [Claude API Docs](https://docs.anthropic.com/)
-- [Vaccination Schedules](https://www.who.int/immunization/schedules)
 - [Product Management for Engineers](https://github.com/ProductHired/pm-for-engineers)
+- [Vaccination Schedules](https://www.who.int/immunization/schedules)
 
 
 

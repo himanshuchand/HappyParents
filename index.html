@@ -57,6 +57,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem;
         }
 
         .logo {
@@ -66,6 +67,7 @@
             font-size: 1.5rem;
             font-weight: 600;
             color: var(--primary);
+            flex-shrink: 0;
         }
 
         .logo-icon {
@@ -78,11 +80,13 @@
             justify-content: center;
             color: white;
             font-size: 1.2rem;
+            flex-shrink: 0;
         }
 
         .nav-tabs {
             display: flex;
             gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .nav-tab {
@@ -95,6 +99,7 @@
             border-radius: 8px;
             transition: all 0.2s;
             font-weight: 500;
+            white-space: nowrap;
         }
 
         .nav-tab.active {
@@ -113,18 +118,14 @@
         }
 
         .panel {
-            display: none;
             flex: 1;
-        }
-
-        .panel.active {
-            display: flex;
-            flex-direction: column;
         }
 
         /* Chat Panel */
         .chat-panel {
             background: var(--bg-card);
+            display: flex;
+            flex-direction: column;
         }
 
         .chat-container {
@@ -220,6 +221,7 @@
             font-family: inherit;
             line-height: 1.5;
             transition: border-color 0.2s;
+            min-height: 52px;
         }
 
         .chat-input:focus {
@@ -229,19 +231,20 @@
 
         .send-button {
             position: absolute;
-            right: 0.5rem;
-            bottom: 0.5rem;
+            right: 0.75rem;
+            bottom: 0.75rem;
             background: var(--primary);
             color: white;
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background 0.2s;
+            flex-shrink: 0;
         }
 
         .send-button:hover {
@@ -698,13 +701,28 @@
                 padding: 1rem;
             }
 
+            .header-content {
+                gap: 0.5rem;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+                gap: 0.4rem;
+            }
+
+            .logo-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 1rem;
+            }
+
             .nav-tabs {
                 gap: 0.25rem;
             }
 
             .nav-tab {
-                padding: 0.5rem 1rem;
-                font-size: 0.9rem;
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
             }
 
             .chat-messages {
@@ -719,6 +737,50 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 0.75rem;
+            }
+
+            .logo {
+                font-size: 1rem;
+            }
+
+            .logo-icon {
+                width: 24px;
+                height: 24px;
+                font-size: 0.9rem;
+            }
+
+            .nav-tab {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .logo {
+                font-size: 1.1rem;
+            }
+
+            .nav-tabs {
+                width: 100%;
+            }
+
+            .nav-tab {
+                flex: 1;
+                text-align: center;
+                padding: 0.5rem 0.5rem;
+                font-size: 0.85rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -730,7 +792,6 @@
             </div>
             <div class="nav-tabs">
                 <button class="nav-tab active" data-tab="chat">AI Assistant</button>
-                <button class="nav-tab" data-tab="vaccines">Vaccine Tracker</button>
             </div>
         </div>
     </header>
@@ -789,51 +850,7 @@
                 </div>
             </div>
         </section>
-
-        <!-- Vaccine Panel -->
-        <section class="panel vaccine-panel" id="vaccine-panel">
-            <div class="vaccine-container">
-                <div class="vaccine-header">
-                    <h2>Vaccination Tracker</h2>
-                    <button class="add-child-button" onclick="showAddChildModal()">
-                        <span>+</span>
-                        Add Child
-                    </button>
-                </div>
-                <div id="children-container" class="children-grid">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">💉</div>
-                        <h3>No children added yet</h3>
-                        <p>Start tracking vaccinations by adding your child's information</p>
-                        <button class="button button-primary" onclick="showAddChildModal()">Add Your First Child</button>
-                    </div>
-                </div>
-            </div>
-        </section>
     </main>
-
-    <!-- Add Child Modal -->
-    <div class="modal-overlay" id="add-child-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>Add Child</h3>
-            </div>
-            <form id="add-child-form">
-                <div class="form-group">
-                    <label class="form-label">Child's Name</label>
-                    <input type="text" class="form-input" id="child-name" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Date of Birth</label>
-                    <input type="date" class="form-input" id="child-dob" required>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="button button-secondary" onclick="closeAddChildModal()">Cancel</button>
-                    <button type="submit" class="button button-primary">Add Child</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <!-- API Key Modal -->
     <div class="modal-overlay" id="api-key-modal">
@@ -860,40 +877,11 @@
     <script>
         // Global State
         let apiKey = localStorage.getItem('anthropic_api_key') || '';
-        let children = JSON.parse(localStorage.getItem('children') || '[]');
         let chatHistory = JSON.parse(localStorage.getItem('chat_history') || '[]');
-
-        // Standard vaccine schedule (India-adapted)
-        const VACCINE_SCHEDULE = [
-            { name: 'BCG', dueAtMonths: 0, description: 'Birth dose' },
-            { name: 'Hepatitis B (Birth dose)', dueAtMonths: 0, description: 'Within 24 hours of birth' },
-            { name: 'OPV-0', dueAtMonths: 0, description: 'Birth dose' },
-            { name: 'OPV-1', dueAtMonths: 1.5, description: '6 weeks' },
-            { name: 'Pentavalent-1', dueAtMonths: 1.5, description: '6 weeks' },
-            { name: 'Rotavirus-1', dueAtMonths: 1.5, description: '6 weeks' },
-            { name: 'PCV-1', dueAtMonths: 1.5, description: '6 weeks' },
-            { name: 'OPV-2', dueAtMonths: 2.5, description: '10 weeks' },
-            { name: 'Pentavalent-2', dueAtMonths: 2.5, description: '10 weeks' },
-            { name: 'Rotavirus-2', dueAtMonths: 2.5, description: '10 weeks' },
-            { name: 'PCV-2', dueAtMonths: 2.5, description: '10 weeks' },
-            { name: 'OPV-3', dueAtMonths: 3.5, description: '14 weeks' },
-            { name: 'Pentavalent-3', dueAtMonths: 3.5, description: '14 weeks' },
-            { name: 'Rotavirus-3', dueAtMonths: 3.5, description: '14 weeks' },
-            { name: 'PCV-3', dueAtMonths: 3.5, description: '14 weeks' },
-            { name: 'IPV-1', dueAtMonths: 1.5, description: '6 weeks' },
-            { name: 'IPV-2', dueAtMonths: 3.5, description: '14 weeks' },
-            { name: 'Measles-Rubella 1', dueAtMonths: 9, description: '9 months' },
-            { name: 'PCV Booster', dueAtMonths: 12, description: '12 months' },
-            { name: 'Measles-Rubella 2', dueAtMonths: 16, description: '16-24 months' },
-            { name: 'DPT Booster-1', dueAtMonths: 16, description: '16-24 months' },
-            { name: 'OPV Booster', dueAtMonths: 16, description: '16-24 months' },
-            { name: 'DPT Booster-2', dueAtMonths: 60, description: '5-6 years' },
-        ];
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             checkApiKey();
-            renderChildren();
             renderChatHistory();
             setupEventListeners();
         });
@@ -905,11 +893,6 @@
         }
 
         function setupEventListeners() {
-            // Tab switching
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-            });
-
             // Chat input
             const chatInput = document.getElementById('chat-input');
             chatInput.addEventListener('keydown', (e) => {
@@ -921,15 +904,11 @@
 
             chatInput.addEventListener('input', function() {
                 this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+                const newHeight = Math.min(this.scrollHeight, 150);
+                this.style.height = Math.max(newHeight, 52) + 'px';
             });
 
-            // Forms
-            document.getElementById('add-child-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                addChild();
-            });
-
+            // API Key Form
             document.getElementById('api-key-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 saveApiKey();
@@ -942,15 +921,6 @@
                         overlay.classList.remove('active');
                     }
                 });
-            });
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.tab === tabName);
-            });
-            document.querySelectorAll('.panel').forEach(panel => {
-                panel.classList.toggle('active', panel.id === `${tabName}-panel`);
             });
         }
 
@@ -1073,7 +1043,23 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('API request failed');
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('API Error Response:', errorData);
+                    
+                    let errorMessage = '❌ ';
+                    if (response.status === 401) {
+                        errorMessage += 'Invalid API key. Please check your key at console.anthropic.com';
+                    } else if (response.status === 429) {
+                        errorMessage += 'Rate limit exceeded. Please wait a moment and try again.';
+                    } else if (response.status === 400) {
+                        errorMessage += 'Bad request. ' + (errorData.error?.message || 'Please try again.');
+                    } else {
+                        errorMessage += `Error (${response.status}): ${errorData.error?.message || 'Please try again.'}`;
+                    }
+                    
+                    removeLoadingIndicator();
+                    appendMessage('assistant', errorMessage);
+                    return;
                 }
 
                 const data = await response.json();
@@ -1084,7 +1070,13 @@
 
             } catch (error) {
                 removeLoadingIndicator();
-                appendMessage('assistant', '❌ Sorry, I encountered an error. Please check your API key and try again.');
+                let errorMsg = '❌ ';
+                if (error.message.includes('Failed to fetch')) {
+                    errorMsg += 'Network error. Check your internet connection or try again.';
+                } else {
+                    errorMsg += 'Something went wrong. Please try again.';
+                }
+                appendMessage('assistant', errorMsg);
                 console.error('Chat error:', error);
             } finally {
                 document.getElementById('send-button').disabled = false;
@@ -1094,163 +1086,6 @@
         function sendSuggestion(text) {
             document.getElementById('chat-input').value = text;
             sendMessage();
-        }
-
-        // Child Management
-        function showAddChildModal() {
-            document.getElementById('add-child-modal').classList.add('active');
-            document.getElementById('add-child-form').reset();
-        }
-
-        function closeAddChildModal() {
-            document.getElementById('add-child-modal').classList.remove('active');
-        }
-
-        function addChild() {
-            const name = document.getElementById('child-name').value.trim();
-            const dob = document.getElementById('child-dob').value;
-
-            if (!name || !dob) return;
-
-            const child = {
-                id: Date.now(),
-                name,
-                dob,
-                vaccines: VACCINE_SCHEDULE.map(v => ({ ...v, completed: false, completedDate: null }))
-            };
-
-            children.push(child);
-            localStorage.setItem('children', JSON.stringify(children));
-            renderChildren();
-            closeAddChildModal();
-        }
-
-        function deleteChild(id) {
-            if (!confirm('Are you sure you want to remove this child?')) return;
-            children = children.filter(c => c.id !== id);
-            localStorage.setItem('children', JSON.stringify(children));
-            renderChildren();
-        }
-
-        function calculateAge(dob) {
-            const birthDate = new Date(dob);
-            const today = new Date();
-            let months = (today.getFullYear() - birthDate.getFullYear()) * 12;
-            months += today.getMonth() - birthDate.getMonth();
-            
-            if (months < 1) {
-                const days = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24));
-                return `${days} day${days !== 1 ? 's' : ''} old`;
-            } else if (months < 12) {
-                return `${months} month${months !== 1 ? 's' : ''} old`;
-            } else {
-                const years = Math.floor(months / 12);
-                const remainingMonths = months % 12;
-                if (remainingMonths === 0) {
-                    return `${years} year${years !== 1 ? 's' : ''} old`;
-                }
-                return `${years}y ${remainingMonths}m old`;
-            }
-        }
-
-        function getVaccineStatus(child, vaccine) {
-            const birthDate = new Date(child.dob);
-            const today = new Date();
-            const ageInMonths = (today.getFullYear() - birthDate.getFullYear()) * 12 + 
-                               (today.getMonth() - birthDate.getMonth());
-            
-            if (vaccine.completed) {
-                return 'completed';
-            } else if (ageInMonths >= vaccine.dueAtMonths) {
-                return 'overdue';
-            } else if (ageInMonths >= vaccine.dueAtMonths - 0.5) {
-                return 'upcoming';
-            }
-            return 'future';
-        }
-
-        function toggleVaccine(childId, vaccineIndex) {
-            const child = children.find(c => c.id === childId);
-            if (!child) return;
-
-            const vaccine = child.vaccines[vaccineIndex];
-            vaccine.completed = !vaccine.completed;
-            vaccine.completedDate = vaccine.completed ? new Date().toISOString() : null;
-
-            localStorage.setItem('children', JSON.stringify(children));
-            renderChildren();
-        }
-
-        function renderChildren() {
-            const container = document.getElementById('children-container');
-            
-            if (children.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">💉</div>
-                        <h3>No children added yet</h3>
-                        <p>Start tracking vaccinations by adding your child's information</p>
-                        <button class="button button-primary" onclick="showAddChildModal()">Add Your First Child</button>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = children.map(child => {
-                const completed = child.vaccines.filter(v => v.completed).length;
-                const total = child.vaccines.length;
-                const progress = (completed / total) * 100;
-
-                const visibleVaccines = child.vaccines.slice(0, 5);
-
-                return `
-                    <div class="child-card">
-                        <div class="child-header">
-                            <div class="child-info">
-                                <h3>${child.name}</h3>
-                                <div class="child-age">${calculateAge(child.dob)}</div>
-                            </div>
-                            <div class="child-actions">
-                                <button class="icon-button" onclick="deleteChild(${child.id})" title="Remove child">
-                                    🗑️
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="vaccine-progress">
-                            <div class="progress-label">
-                                <span>Vaccine Progress</span>
-                                <span>${completed}/${total}</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${progress}%"></div>
-                            </div>
-                        </div>
-
-                        <div class="vaccines-list">
-                            ${visibleVaccines.map((vaccine, index) => {
-                                const status = getVaccineStatus(child, vaccine);
-                                return `
-                                    <div class="vaccine-item ${status}" onclick="toggleVaccine(${child.id}, ${index})">
-                                        <div class="vaccine-checkbox">
-                                            ${vaccine.completed ? '✓' : ''}
-                                        </div>
-                                        <div class="vaccine-details">
-                                            <div class="vaccine-name">${vaccine.name}</div>
-                                            <div class="vaccine-due">${vaccine.description}</div>
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('')}
-                            ${child.vaccines.length > 5 ? `
-                                <div style="text-align: center; padding: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
-                                    +${child.vaccines.length - 5} more vaccines
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
         }
     </script>
 </body>
