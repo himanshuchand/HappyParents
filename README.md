@@ -2,7 +2,7 @@
 
 **An MVP for first-time parents to get AI-powered parenting advice and track their child's vaccinations.**
 
----
+
 
 ## 🎯 Product Overview
 
@@ -17,31 +17,18 @@ HappyParents provides:
 - **Vaccination Tracker**: Simple, visual tracking of immunization schedules
 - **Zero Setup**: Works immediately in any browser, no account required
 
----
+
 
 ## 🚀 Quick Start (5 minutes)
 
-### Option 1: GitHub Pages (Recommended for Testing)
+### Option 1: GitHub Pages
 1. **Fork this repository** or create a new repo
 2. **Upload `index.html`** to your repository
 3. Go to **Settings → Pages**
 4. Set source to **main branch** and **/ (root)**
 5. Your app will be live at `https://yourusername.github.io/happyparents`
 
-### Option 2: Local Development
-```bash
-# No build needed! Just open the file
-open index.html
-# or
-python -m http.server 8000
-# Then visit: http://localhost:8000
-```
 
-### Option 3: Deploy to Vercel/Netlify
-1. Drag and drop `index.html` into Vercel or Netlify
-2. Deploy in seconds
-
----
 
 ## 🔑 Getting Your API Key
 
@@ -53,7 +40,7 @@ python -m http.server 8000
 
 **Cost**: Claude Sonnet 4 costs approximately $0.003 per conversation message. For MVP testing with 10 users having 20 conversations each = ~$0.60 total.
 
----
+
 
 ## 📋 Features
 
@@ -76,7 +63,7 @@ python -m http.server 8000
 - 🔲 Community Q&A
 - 🔲 Doctor integration via FHIR
 
----
+
 
 ## 🏗️ Technical Architecture
 
@@ -118,7 +105,7 @@ User Input → Claude API → Response → localStorage → UI Update
 }
 ```
 
----
+
 
 ## 🎨 Design Principles
 
@@ -128,7 +115,7 @@ User Input → Claude API → Response → localStorage → UI Update
 4. **Mobile-first**: 70% of parents are on mobile during night feedings
 5. **Offline-capable**: Works without internet after first load
 
----
+
 
 ## 🤝 Contributing
 
@@ -139,7 +126,7 @@ This is an MVP for validation. If you want to contribute:
 3. **Feature ideas**: Describe the problem, not the solution
 4. **Internationalization**: Add vaccine schedules for other countries
 
----
+
 
 ## 📚 Learning Resources
 
@@ -148,7 +135,7 @@ This is an MVP for validation. If you want to contribute:
 - [Vaccination Schedules](https://www.who.int/immunization/schedules)
 - [Product Management for Engineers](https://github.com/ProductHired/pm-for-engineers)
 
----
+
 
 ## 📞 Support & Feedback
 
@@ -156,13 +143,13 @@ This is an MVP for validation. If you want to contribute:
 - **Ideas**: Start a discussion
 - **Questions**: Email or Discord (add your contact)
 
----
+
 
 ## 📄 License
 
 MIT License - use this however you want! If you build a startup from this, send us a postcard 😊
 
----
+
 
 ## 🙏 Acknowledgments
 
@@ -170,6 +157,6 @@ MIT License - use this however you want! If you build a startup from this, send 
 - WHO for vaccine schedule data
 - First-time parents everywhere who inspired this
 
----
+
 
 **Built with ❤️ for sleep-deprived parents**
