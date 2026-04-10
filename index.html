@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HappyParents - AI Parenting Assistant & Vaccine Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7C3AED;
+            --primary-dark: #6D28D9;
+            --secondary: #EC4899;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --bg: #FAFAFA;
+            --bg-card: #FFFFFF;
+            --text: #1F2937;
+            --text-light: #6B7280;
+            --border: #E5E7EB;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        /* Header */
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-tab {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .nav-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: var(--bg);
+        }
+
+        /* Main Layout */
+        main {
+            display: flex;
+            height: calc(100vh - 73px);
+        }
+
+        .panel {
+            display: none;
+            flex: 1;
+        }
+
+        .panel.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Chat Panel */
+        .chat-panel {
+            background: var(--bg-card);
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 1rem;
+            max-width: 700px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .message.assistant .message-avatar {
+            background: var(--bg);
+            border: 2px solid var(--border);
+        }
+
+        .message-content {
+            background: var(--bg);
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            line-height: 1.6;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .chat-input-container {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+
+        .chat-input-wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 1rem 4rem 1rem 1.25rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            resize: none;
+            font-family: inherit;
+            line-height: 1.5;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .send-button {
+            position: absolute;
+            right: 0.5rem;
+            bottom: 0.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .send-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .welcome-screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        .welcome-screen h2 {
+            font-size: 2rem;
+            color: var(--text);
+        }
+
+        .welcome-screen p {
+            color: var(--text-light);
+            max-width: 500px;
+        }
+
+        .suggestion-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .suggestion-card {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .suggestion-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .suggestion-card-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text);
+        }
+
+        .suggestion-card-text {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* Vaccine Panel */
+        .vaccine-panel {
+            background: var(--bg);
+        }
+
+        .vaccine-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .vaccine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .vaccine-header h2 {
+            font-size: 1.75rem;
+            color: var(--text);
+        }
+
+        .add-child-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .add-child-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .children-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .child-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .child-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .child-info h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .child-age {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .child-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .icon-button {
+            background: transparent;
+            border: 1px solid var(--border);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-button:hover {
+            background: var(--bg);
+        }
+
+        .vaccine-progress {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), #34D399);
+            transition: width 0.3s;
+        }
+
+        .vaccines-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .vaccine-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .vaccine-item:hover {
+            background: #F3F4F6;
+        }
+
+        .vaccine-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .vaccine-item.completed .vaccine-checkbox {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .vaccine-details {
+            flex: 1;
+        }
+
+        .vaccine-name {
+            font-weight: 500;
+            margin-bottom: 0.15rem;
+        }
+
+        .vaccine-item.completed .vaccine-name {
+            color: var(--text-light);
+            text-decoration: line-through;
+        }
+
+        .vaccine-due {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .vaccine-item.overdue .vaccine-due {
+            color: var(--danger);
+            font-weight: 500;
+        }
+
+        .vaccine-item.upcoming .vaccine-due {
+            color: var(--warning);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .button {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .button-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .button-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .button-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .button-secondary:hover {
+            background: #F3F4F6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .empty-state p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .api-key-banner {
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            border: 2px solid #F59E0B;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .api-key-banner-icon {
+            font-size: 1.5rem;
+        }
+
+        .api-key-banner-content {
+            flex: 1;
+        }
+
+        .api-key-banner-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #92400E;
+        }
+
+        .api-key-banner-text {
+            font-size: 0.9rem;
+            color: #78350F;
+        }
+
+        .api-key-banner-action {
+            background: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            color: #92400E;
+            transition: transform 0.2s;
+        }
+
+        .api-key-banner-action:hover {
+            transform: scale(1.05);
+        }
+
+        .loading-indicator {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text-light);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+            }
+
+            .nav-tabs {
+                gap: 0.25rem;
+            }
+
+            .nav-tab {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .chat-messages {
+                padding: 1rem;
+            }
+
+            .vaccine-container {
+                padding: 1rem;
+            }
+
+            .children-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">👶</div>
+                HappyParents
+            </div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="chat">AI Assistant</button>
+                <button class="nav-tab" data-tab="vaccines">Vaccine Tracker</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Chat Panel -->
+        <section class="panel chat-panel active" id="chat-panel">
+            <div id="api-key-banner" class="api-key-banner" style="display: none;">
+                <div class="api-key-banner-icon">🔑</div>
+                <div class="api-key-banner-content">
+                    <div class="api-key-banner-title">API Key Required</div>
+                    <div class="api-key-banner-text">Add your Anthropic API key to chat with the AI assistant</div>
+                </div>
+                <button class="api-key-banner-action" onclick="showApiKeyModal()">Add Key</button>
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="welcome-screen">
+                        <h2>👋 Welcome to HappyParents</h2>
+                        <p>Your AI-powered parenting companion. Ask me anything about caring for your little one!</p>
+                        <div class="suggestion-cards">
+                            <div class="suggestion-card" onclick="sendSuggestion('How do I handle night wakings for a 6-month-old?')">
+                                <div class="suggestion-card-title">🌙 Sleep Issues</div>
+                                <div class="suggestion-card-text">Night wakings & sleep training</div>
+                            </div>
+                            <div class="suggestion-card" onclick="sendSuggestion('What should I do if my baby has a fever?')">
+                                <div class="suggestion-card-title">🌡️ Health Concerns</div>
+                                <div class="suggestion-card-text">Fever, symptoms & when to call doctor</div>
+                            </div>
+                            <div class="suggestion-card" onclick="sendSuggestion('How do I start introducing solid foods?')">
+                                <div class="suggestion-card-title">🥕 Feeding Guide</div>
+                                <div class="suggestion-card-text">Starting solids & nutrition</div>
+                            </div>
+                            <div class="suggestion-card" onclick="sendSuggestion('What are the developmental milestones for a 1-year-old?')">
+                                <div class="suggestion-card-title">📊 Milestones</div>
+                                <div class="suggestion-card-text">Tracking development</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <textarea 
+                            id="chat-input" 
+                            class="chat-input" 
+                            placeholder="Ask me anything about parenting..."
+                            rows="1"
+                        ></textarea>
+                        <button class="send-button" id="send-button" onclick="sendMessage()">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M18 2L9 11M18 2L12 18L9 11M18 2L2 8L9 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vaccine Panel -->
+        <section class="panel vaccine-panel" id="vaccine-panel">
+            <div class="vaccine-container">
+                <div class="vaccine-header">
+                    <h2>Vaccination Tracker</h2>
+                    <button class="add-child-button" onclick="showAddChildModal()">
+                        <span>+</span>
+                        Add Child
+                    </button>
+                </div>
+                <div id="children-container" class="children-grid">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💉</div>
+                        <h3>No children added yet</h3>
+                        <p>Start tracking vaccinations by adding your child's information</p>
+                        <button class="button button-primary" onclick="showAddChildModal()">Add Your First Child</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Add Child Modal -->
+    <div class="modal-overlay" id="add-child-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add Child</h3>
+            </div>
+            <form id="add-child-form">
+                <div class="form-group">
+                    <label class="form-label">Child's Name</label>
+                    <input type="text" class="form-input" id="child-name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date" class="form-input" id="child-dob" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="button button-secondary" onclick="closeAddChildModal()">Cancel</button>
+                    <button type="submit" class="button button-primary">Add Child</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- API Key Modal -->
+    <div class="modal-overlay" id="api-key-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add Anthropic API Key</h3>
+            </div>
+            <form id="api-key-form">
+                <div class="form-group">
+                    <label class="form-label">API Key</label>
+                    <input type="password" class="form-input" id="api-key-input" placeholder="sk-ant-...">
+                    <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.5rem;">
+                        Get your API key from <a href="https://console.anthropic.com/" target="_blank" style="color: var(--primary);">console.anthropic.com</a>
+                    </p>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="button button-secondary" onclick="closeApiKeyModal()">Cancel</button>
+                    <button type="submit" class="button button-primary">Save Key</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global State
+        let apiKey = localStorage.getItem('anthropic_api_key') || '';
+        let children = JSON.parse(localStorage.getItem('children') || '[]');
+        let chatHistory = JSON.parse(localStorage.getItem('chat_history') || '[]');
+
+        // Standard vaccine schedule (India-adapted)
+        const VACCINE_SCHEDULE = [
+            { name: 'BCG', dueAtMonths: 0, description: 'Birth dose' },
+            { name: 'Hepatitis B (Birth dose)', dueAtMonths: 0, description: 'Within 24 hours of birth' },
+            { name: 'OPV-0', dueAtMonths: 0, description: 'Birth dose' },
+            { name: 'OPV-1', dueAtMonths: 1.5, description: '6 weeks' },
+            { name: 'Pentavalent-1', dueAtMonths: 1.5, description: '6 weeks' },
+            { name: 'Rotavirus-1', dueAtMonths: 1.5, description: '6 weeks' },
+            { name: 'PCV-1', dueAtMonths: 1.5, description: '6 weeks' },
+            { name: 'OPV-2', dueAtMonths: 2.5, description: '10 weeks' },
+            { name: 'Pentavalent-2', dueAtMonths: 2.5, description: '10 weeks' },
+            { name: 'Rotavirus-2', dueAtMonths: 2.5, description: '10 weeks' },
+            { name: 'PCV-2', dueAtMonths: 2.5, description: '10 weeks' },
+            { name: 'OPV-3', dueAtMonths: 3.5, description: '14 weeks' },
+            { name: 'Pentavalent-3', dueAtMonths: 3.5, description: '14 weeks' },
+            { name: 'Rotavirus-3', dueAtMonths: 3.5, description: '14 weeks' },
+            { name: 'PCV-3', dueAtMonths: 3.5, description: '14 weeks' },
+            { name: 'IPV-1', dueAtMonths: 1.5, description: '6 weeks' },
+            { name: 'IPV-2', dueAtMonths: 3.5, description: '14 weeks' },
+            { name: 'Measles-Rubella 1', dueAtMonths: 9, description: '9 months' },
+            { name: 'PCV Booster', dueAtMonths: 12, description: '12 months' },
+            { name: 'Measles-Rubella 2', dueAtMonths: 16, description: '16-24 months' },
+            { name: 'DPT Booster-1', dueAtMonths: 16, description: '16-24 months' },
+            { name: 'OPV Booster', dueAtMonths: 16, description: '16-24 months' },
+            { name: 'DPT Booster-2', dueAtMonths: 60, description: '5-6 years' },
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkApiKey();
+            renderChildren();
+            renderChatHistory();
+            setupEventListeners();
+        });
+
+        function checkApiKey() {
+            if (!apiKey) {
+                document.getElementById('api-key-banner').style.display = 'flex';
+            }
+        }
+
+        function setupEventListeners() {
+            // Tab switching
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            });
+
+            // Chat input
+            const chatInput = document.getElementById('chat-input');
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            chatInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+            });
+
+            // Forms
+            document.getElementById('add-child-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                addChild();
+            });
+
+            document.getElementById('api-key-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveApiKey();
+            });
+
+            // Close modals on overlay click
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.panel').forEach(panel => {
+                panel.classList.toggle('active', panel.id === `${tabName}-panel`);
+            });
+        }
+
+        // API Key Management
+        function showApiKeyModal() {
+            document.getElementById('api-key-modal').classList.add('active');
+            document.getElementById('api-key-input').value = apiKey;
+        }
+
+        function closeApiKeyModal() {
+            document.getElementById('api-key-modal').classList.remove('active');
+        }
+
+        function saveApiKey() {
+            const newKey = document.getElementById('api-key-input').value.trim();
+            if (newKey) {
+                apiKey = newKey;
+                localStorage.setItem('anthropic_api_key', apiKey);
+                document.getElementById('api-key-banner').style.display = 'none';
+                closeApiKeyModal();
+            }
+        }
+
+        // Chat Functions
+        function renderChatHistory() {
+            if (chatHistory.length === 0) return;
+            
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.innerHTML = '';
+            
+            chatHistory.forEach(msg => {
+                appendMessage(msg.role, msg.content, false);
+            });
+        }
+
+        function appendMessage(role, content, save = true) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const welcomeScreen = messagesContainer.querySelector('.welcome-screen');
+            if (welcomeScreen) {
+                welcomeScreen.remove();
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            
+            const avatar = role === 'user' ? '👤' : '🤖';
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatar}</div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            if (save) {
+                chatHistory.push({ role, content });
+                localStorage.setItem('chat_history', JSON.stringify(chatHistory));
+            }
+        }
+
+        function showLoadingIndicator() {
+            const messagesContainer = document.getElementById('chat-messages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message assistant';
+            loadingDiv.id = 'loading-indicator';
+            loadingDiv.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <div class="loading-indicator">
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                    </div>
+                </div>
+            `;
+            messagesContainer.appendChild(loadingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function removeLoadingIndicator() {
+            const loading = document.getElementById('loading-indicator');
+            if (loading) loading.remove();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            if (!apiKey) {
+                showApiKeyModal();
+                return;
+            }
+
+            appendMessage('user', message);
+            input.value = '';
+            input.style.height = 'auto';
+
+            showLoadingIndicator();
+            document.getElementById('send-button').disabled = true;
+
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': apiKey,
+                        'anthropic-version': '2023-06-01'
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 1024,
+                        system: 'You are a helpful parenting assistant. Provide supportive, evidence-based advice for parents of newborns and young children. Be empathetic, practical, and concise. Always remind parents to consult healthcare professionals for medical concerns.',
+                        messages: [
+                            ...chatHistory.map(msg => ({ role: msg.role, content: msg.content })),
+                            { role: 'user', content: message }
+                        ]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+
+                const data = await response.json();
+                const assistantMessage = data.content[0].text;
+
+                removeLoadingIndicator();
+                appendMessage('assistant', assistantMessage);
+
+            } catch (error) {
+                removeLoadingIndicator();
+                appendMessage('assistant', '❌ Sorry, I encountered an error. Please check your API key and try again.');
+                console.error('Chat error:', error);
+            } finally {
+                document.getElementById('send-button').disabled = false;
+            }
+        }
+
+        function sendSuggestion(text) {
+            document.getElementById('chat-input').value = text;
+            sendMessage();
+        }
+
+        // Child Management
+        function showAddChildModal() {
+            document.getElementById('add-child-modal').classList.add('active');
+            document.getElementById('add-child-form').reset();
+        }
+
+        function closeAddChildModal() {
+            document.getElementById('add-child-modal').classList.remove('active');
+        }
+
+        function addChild() {
+            const name = document.getElementById('child-name').value.trim();
+            const dob = document.getElementById('child-dob').value;
+
+            if (!name || !dob) return;
+
+            const child = {
+                id: Date.now(),
+                name,
+                dob,
+                vaccines: VACCINE_SCHEDULE.map(v => ({ ...v, completed: false, completedDate: null }))
+            };
+
+            children.push(child);
+            localStorage.setItem('children', JSON.stringify(children));
+            renderChildren();
+            closeAddChildModal();
+        }
+
+        function deleteChild(id) {
+            if (!confirm('Are you sure you want to remove this child?')) return;
+            children = children.filter(c => c.id !== id);
+            localStorage.setItem('children', JSON.stringify(children));
+            renderChildren();
+        }
+
+        function calculateAge(dob) {
+            const birthDate = new Date(dob);
+            const today = new Date();
+            let months = (today.getFullYear() - birthDate.getFullYear()) * 12;
+            months += today.getMonth() - birthDate.getMonth();
+            
+            if (months < 1) {
+                const days = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24));
+                return `${days} day${days !== 1 ? 's' : ''} old`;
+            } else if (months < 12) {
+                return `${months} month${months !== 1 ? 's' : ''} old`;
+            } else {
+                const years = Math.floor(months / 12);
+                const remainingMonths = months % 12;
+                if (remainingMonths === 0) {
+                    return `${years} year${years !== 1 ? 's' : ''} old`;
+                }
+                return `${years}y ${remainingMonths}m old`;
+            }
+        }
+
+        function getVaccineStatus(child, vaccine) {
+            const birthDate = new Date(child.dob);
+            const today = new Date();
+            const ageInMonths = (today.getFullYear() - birthDate.getFullYear()) * 12 + 
+                               (today.getMonth() - birthDate.getMonth());
+            
+            if (vaccine.completed) {
+                return 'completed';
+            } else if (ageInMonths >= vaccine.dueAtMonths) {
+                return 'overdue';
+            } else if (ageInMonths >= vaccine.dueAtMonths - 0.5) {
+                return 'upcoming';
+            }
+            return 'future';
+        }
+
+        function toggleVaccine(childId, vaccineIndex) {
+            const child = children.find(c => c.id === childId);
+            if (!child) return;
+
+            const vaccine = child.vaccines[vaccineIndex];
+            vaccine.completed = !vaccine.completed;
+            vaccine.completedDate = vaccine.completed ? new Date().toISOString() : null;
+
+            localStorage.setItem('children', JSON.stringify(children));
+            renderChildren();
+        }
+
+        function renderChildren() {
+            const container = document.getElementById('children-container');
+            
+            if (children.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💉</div>
+                        <h3>No children added yet</h3>
+                        <p>Start tracking vaccinations by adding your child's information</p>
+                        <button class="button button-primary" onclick="showAddChildModal()">Add Your First Child</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = children.map(child => {
+                const completed = child.vaccines.filter(v => v.completed).length;
+                const total = child.vaccines.length;
+                const progress = (completed / total) * 100;
+
+                const visibleVaccines = child.vaccines.slice(0, 5);
+
+                return `
+                    <div class="child-card">
+                        <div class="child-header">
+                            <div class="child-info">
+                                <h3>${child.name}</h3>
+                                <div class="child-age">${calculateAge(child.dob)}</div>
+                            </div>
+                            <div class="child-actions">
+                                <button class="icon-button" onclick="deleteChild(${child.id})" title="Remove child">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="vaccine-progress">
+                            <div class="progress-label">
+                                <span>Vaccine Progress</span>
+                                <span>${completed}/${total}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="vaccines-list">
+                            ${visibleVaccines.map((vaccine, index) => {
+                                const status = getVaccineStatus(child, vaccine);
+                                return `
+                                    <div class="vaccine-item ${status}" onclick="toggleVaccine(${child.id}, ${index})">
+                                        <div class="vaccine-checkbox">
+                                            ${vaccine.completed ? '✓' : ''}
+                                        </div>
+                                        <div class="vaccine-details">
+                                            <div class="vaccine-name">${vaccine.name}</div>
+                                            <div class="vaccine-due">${vaccine.description}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                            ${child.vaccines.length > 5 ? `
+                                <div style="text-align: center; padding: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                                    +${child.vaccines.length - 5} more vaccines
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>
